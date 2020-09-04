@@ -1,3 +1,7 @@
+###Output
+
+![alt text](https://github.com/HRK31/Drophipp/blob/master/Screenshot_2020-09-04 Dropshhip.png?raw=true)
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
