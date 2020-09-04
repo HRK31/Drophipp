@@ -6,8 +6,13 @@ import {
     Card,
     Checkbox,
     TextField,
-    RadioButton,
-    Stack
+    Stack,
+    Select,
+    ChoiceList,
+    VisuallyHidden,
+    Heading,
+    FormLayout,
+    PageActions,
 } from '@shopify/polaris'
 
 class SettingsForm extends Component{
@@ -16,11 +21,25 @@ class SettingsForm extends Component{
         this.state = {
             connected :false,
             autoPublish: false,
+            pricingRuleMethod: 'Multiplier',
+            pricinModifier: '1',
+            trackingUrl: '',
+            emailfulfillment: true,
+            reportingEmailFrequency: ['Weekly']
         }
     }
     render() {
+        const PricingRuleInput = (
+            <Select
+                label='Pricing rule method'
+                labelHidden
+                options={['Multiplier','Fixed markup']}
+                value={this.state.pricingRuleMethod}
+                onChange={this.handleInputChange('pricingRuleMethod')}
+            />
+        )
         return(
-            <form>
+            <form onSubmit={this.handleForsubmit.bind(this)}>
                 <Layout>
                 <Layout.AnnotatedSection
                     title="Connected User"
@@ -41,19 +60,36 @@ class SettingsForm extends Component{
                             onChange={this.handleInputChange('autoPublish')}
                             />
                     </Card>
-                    <Card sectioned title="Pricing rules"></Card>
+                    <Card sectioned title="Pricing rules">
+                        <Stack alignment="baseline">
+                            <span>Product list price *</span>
+                            <span>Your Cost</span>
+                            <div style={{maxWidth: 200}}>
+                                <TextField 
+                                connectedLeft={PricingRuleInput}
+                                value={this.state.pricingModifier}
+                                onChange={this.handleInputChange('pricingModifier')}
+                                />
+                            </div>
+                        </Stack>
+                    </Card>
                     <Card sectioned title="Shipping">
-                    <Checkbox
-                            label="Automatically publish new products"
-                            helpText="New products add in DropShipp will immediately be published to all of your Shopify sales channels."
-                            checked={this.state.autoShip}
-                            onChange={this.handleInputChange('autoShip')}
-                            />
-                            <TextField 
-                            label="Custom Shipment tracking URL" 
-                            helpText="Overrides the normal shipment tracking link enabled to your Customer.Learn more about 
-                            custom tracking URLs."
-                            />
+                        <FormLayout>
+                                <Checkbox
+                                label="Email customers when orders are fulfilled"
+                                checked={this.state.emailfulfillment}
+                                onChange={this.handleInputChange('autoShip')}
+                                />
+                                
+                                <TextField 
+                                value={this.state.trackingUrl}
+                                onChange={this.handleInputChange('trackingUrl')}
+                                label="Custom Shipment tracking URL" 
+                                helpText={
+                                    <span>Overrides the normal shipment tracking link enabled to your Customer.<Link>Learn more about 
+                                custom tracking URLs.</Link></span>}
+                                />
+                            </FormLayout>
                     </Card>
                 </Layout.AnnotatedSection>
 
@@ -61,27 +97,30 @@ class SettingsForm extends Component{
                     title="Reporting"
                     description="Manage how you track success with Dropshipp"
                 >
-                    <Card sectioned title="Receive reports via email:">
-                        <Stack vertical>
-                        <RadioButton
-                            label="Never"
-                            id="never"
+                    <Card sectioned >
+                        <VisuallyHidden><Heading>Reporting Details</Heading></VisuallyHidden>
+                        <ChoiceList
+                            title="Receive reportsw via email:"
+                            choices={[
+                                { label: 'Never', value: 'Never'},
+                                { label: 'Daily', value: 'Daily'},
+                                { label: 'Weekly', value: 'Weekly'},
+                                { label: 'Monthly', value: 'Monthly'},
+                            ]}
+                            selected=
+                            {this.state.reportingEmailFrequency}
+                            onChange={this.handleInputChange('this.handleInputChange')}
                         />
-                        <RadioButton
-                            label="Daily"
-                            id="daily"
-                        />
-                        <RadioButton
-                            label="Weekly"
-                            id="weekly"
-                        />
-                        <RadioButton
-                            label="Monthly"
-                            id="monthly"
-                        />
-                        </Stack>
                     </Card>
                 </Layout.AnnotatedSection>
+                <Layout.Section>
+                    <PageActions
+                        primaryAction={{
+                            content: 'Save',
+                            submit: true,
+                        }}
+                    />
+                </Layout.Section>
                 </Layout>
             </form>
         );
@@ -95,6 +134,10 @@ class SettingsForm extends Component{
         return (value) => this.setState({[field]: value})
     }
 
+    handleForsubmit(evt){
+        evt.preventDefault();
+        console.log(this.state);
+    }
     accountConnectionMarkup(){
         return this.state.connected
         ?(
